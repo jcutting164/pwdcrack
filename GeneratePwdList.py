@@ -13,6 +13,7 @@ def main():
     uppercase = False
     symbols = False
     numbers = False
+    combos = 0
     totalslots = 0
 
     lowercasealpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -41,50 +42,131 @@ def main():
         numbers = True
         totalslots += 10
         masterlist += numbersalpha
-    totalcombos = pow(totalslots, charcount)
 
-    print("Total combinations generating: " + str(totalcombos))
-    print("Masterlist: " + ''.join(masterlist))
+    partpwdstr = ""
+    partpwd = []
+    if input("Do you know any characters? : ") == "y":
+        partpwdstr = str(input("Write out password with '-' in unknown character places: "))
+        partpwd = [char for char in partpwdstr]
+        print(partpwdstr)
+        print(partpwd)
 
-    # 26 upper case
-    # 26 lower case
-    # 10 numbers
-    # 32 symbols
+    if len(partpwdstr) == 0:
+        totalcombos = pow(totalslots, charcount)
 
-    thepwd = []
-    totallist = []
-    finaltotallines = []
+        print("Total combinations generating: " + str(totalcombos))
+        print("Masterlist: " + ''.join(masterlist))
 
-    # init of pwd
-    for x in range(0, charcount):
-        thepwd += masterlist[0]
+        # 26 upper case
+        # 26 lower case
+        # 10 numbers
+        # 32 symbols
 
+        thepwd = []
+        totallist = []
+        finaltotallines = []
 
-    # ''.join(list)  returns the string of a list for totallist
+        # init of pwd
+        for x in range(0, charcount):
+            thepwd += masterlist[0]
 
-    for x in range(0, totalcombos-1):
-        finaltotallines += ''.join(thepwd + list("\n"))
-        tempint = 0
-        currentchar = thepwd[tempint]
+        # ''.join(list)  returns the string of a list for totallist
 
-        while currentchar == masterlist[len(masterlist) - 1]:
-            thepwd = changechar(tempint, thepwd, masterlist[len(masterlist) - 1])
-            tempint += 1
+        for x in range(0, totalcombos - 1):
+            combos += 1
+            if (combos >= 1000000):
+                print(x)
+                combos = 0
+            finaltotallines += ''.join(thepwd + list("\n"))
+            tempint = 0
             currentchar = thepwd[tempint]
 
-        # this line changes the letter designated by moving it one up the scale
-        thepwd = changechar(tempint, thepwd, masterlist[masterlist.index(thepwd[tempint]) + 1])
+            while currentchar == masterlist[len(masterlist) - 1]:
+                thepwd = changechar(tempint, thepwd, masterlist[len(masterlist) - 1])
+                tempint += 1
+                currentchar = thepwd[tempint]
 
-        # resets every slot before it
+            # this line changes the letter designated by moving it one up the scale
+            thepwd = changechar(tempint, thepwd, masterlist[masterlist.index(thepwd[tempint]) + 1])
 
-        if tempint != 0:
-            for spot in range(0, tempint):
-                thepwd = changechar(spot, thepwd, masterlist[0])
+            # resets every slot before it
 
-    finaltotallines += ''.join(thepwd + list("\n"))
-    f = open("pwdlist.txt", "a")
-    f.writelines(finaltotallines)
-    f.close()
+            if tempint != 0:
+                for spot in range(0, tempint):
+                    thepwd = changechar(spot, thepwd, masterlist[0])
+
+        finaltotallines += ''.join(thepwd + list("\n"))
+        f = open("pwdlist.txt", "a")
+        f.writelines(finaltotallines)
+        f.close()
+    else:
+        tempcharcount = charcount
+        for char in partpwd:
+            if char != "-":
+                tempcharcount -= 1
+        totalcombos = pow(totalslots, tempcharcount)
+        print("Total combinations generating: " + str(totalcombos))
+        print("Masterlist: " + ''.join(masterlist))
+
+        # 26 upper case
+        # 26 lower case
+        # 10 numbers
+        # 32 symbols
+
+        thepwd = []
+        totallist = []
+        finaltotallines = []
+
+        # init of pwd
+        for x in range(0, charcount):
+            if(partpwd[x]=="-"):
+                thepwd += masterlist[0]
+            else:
+                thepwd+=partpwd[x]
+
+        # ''.join(list)  returns the string of a list for totallist
+        lockedinchars = []
+
+        for char in thepwd:
+            if(char!=masterlist[0]):
+                lockedinchars.append("True")
+            else:
+                lockedinchars.append("False")
+
+        print(lockedinchars)
+        for x in range(0, totalcombos - 1):
+            combos += 1
+            if (combos >= 1000000):
+                print(x)
+                combos = 0
+            finaltotallines += ''.join(thepwd + list("\n"))
+            tempint = 0
+            currentchar = thepwd[tempint]
+
+            #creates boolean list of locked in chars...
+
+
+
+
+            while currentchar == masterlist[len(masterlist) - 1] or lockedinchars[tempint]=="True":
+                #thepwd = changechar(tempint, thepwd, masterlist[len(masterlist) - 1])
+                tempint += 1
+                currentchar = thepwd[tempint]
+
+            # this line changes the letter designated by moving it one up the scale
+            thepwd = changechar(tempint, thepwd, masterlist[masterlist.index(thepwd[tempint]) + 1])
+
+            # resets every slot before it
+
+            if tempint != 0:
+                for spot in range(0, tempint):
+                    if not lockedinchars[spot]=="True":
+                        thepwd = changechar(spot, thepwd, masterlist[0])
+
+        finaltotallines += ''.join(thepwd + list("\n"))
+        f = open("pwdlist.txt", "a")
+        f.writelines(finaltotallines)
+        f.close()
 
 
 if __name__ == '__main__':
